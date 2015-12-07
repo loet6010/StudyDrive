@@ -434,6 +434,7 @@
     //*********************
     //给协议传值
     [_clDelegate changeLabelText:_currentPage];
+    [_clDelegate changeCollect:_currentPage];
     //*********************
 }
 

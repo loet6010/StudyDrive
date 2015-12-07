@@ -11,7 +11,12 @@
 //*********************
 //声明协议
 @protocol ChangeLabelDelegate
+//变动题目号的代理
 -(void)changeLabelText:(int)titleNum;
+
+//变动收藏页的代理
+-(void)changeCollect:(int)titleNum;
+
 @end
 //*********************
 

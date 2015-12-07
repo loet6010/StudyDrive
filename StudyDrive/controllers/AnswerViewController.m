@@ -33,6 +33,10 @@
     //收藏题目时用的view
     UIView *_collectView;
     UILabel *_collectLabel;
+    
+    //收藏按钮
+    UIButton *_collectBtn;
+    UILabel *_collectBtnLabel;
 }
 
 @end
@@ -187,6 +191,7 @@
             [tbBtn setBackgroundImage:[UIImage imageNamed:[NSString stringWithFormat:@"%d-2.png",16+i]] forState:UIControlStateHighlighted];
             //
             tbBtn.tag = 301+i;
+            
             //
             [tbBtn addTarget:self action:@selector(clickToolBar:) forControlEvents:UIControlEventTouchUpInside];
             
@@ -209,6 +214,25 @@
             //第三个按钮的设计（从我的收藏进，将我的收藏改为解除收藏）
             if (i==2&&_answerType==8) {
                 tbLabel.text = @"取消收藏";
+            }
+            
+            //设置收藏按钮
+            if (i==2) {
+                //绑定收藏按钮
+                _collectBtn = tbBtn;
+                //绑定收藏label
+                _collectBtnLabel = tbLabel;
+                
+                //获取当前题目的数据
+                AnswerModel *model = [_anScrollView.dataArrry objectAtIndex:0];
+                
+                //判断题目是否被收藏
+                if ([QuestionCollectManager selectCollectQuestiong:model.mid]) {//已被收藏
+                    //收藏图标改变
+                    [_collectBtn setBackgroundImage:[UIImage imageNamed:[NSString stringWithFormat:@"18-2.png"]] forState:UIControlStateNormal];
+                    //文字改变
+                    _collectBtnLabel.text = @"取消收藏";
+                }
             }
             
             [tbView addSubview:tbLabel];
@@ -279,7 +303,7 @@
 -(void)testRunTime{
     _testTime = _testTime - 1;
     _timeLabel.text = [NSString stringWithFormat:@"%d:%d",_testTime/60,_testTime%60];
-    NSLog(@"%@",_timeLabel.text);
+//    NSLog(@"%@",_timeLabel.text);
 }
 //画面消失后关闭计时器
 -(void)viewDidDisappear:(BOOL)animated{
@@ -336,6 +360,22 @@
 -(void)changeLabelText:(int)titleNum{
     changeLabel.text = [NSString stringWithFormat:@"%d/%lu",titleNum+1,(unsigned long)_anScrollView.dataArrry.count];;
 }
+
+-(void)changeCollect:(int)titleNum {
+    //获取当前题目的数据
+    AnswerModel *model = [_anScrollView.dataArrry objectAtIndex:titleNum];
+    
+    //判断题目是否被收藏
+    if ([QuestionCollectManager selectCollectQuestiong:model.mid]) {//已被收藏
+        //收藏图标改变
+        [_collectBtn setBackgroundImage:[UIImage imageNamed:[NSString stringWithFormat:@"18-2.png"]] forState:UIControlStateNormal];
+        _collectBtnLabel.text = @"取消收藏";
+    } else {
+        //收藏图标改变
+        [_collectBtn setBackgroundImage:[UIImage imageNamed:[NSString stringWithFormat:@"18.png"]] forState:UIControlStateNormal];
+        _collectBtnLabel.text = @"收藏本题";
+    }
+}
 //*********************
 
 
@@ -386,14 +426,19 @@
             }
         }
             break;
-        case 303:{//收藏本题
+        case 303:{//收藏/取消收藏 本题
             
             //获取当前题目的数据
             AnswerModel *model = [_anScrollView.dataArrry objectAtIndex:_anScrollView.currentPage];
-
-            //从我的收藏进页面点击是移除收藏
-            if (_answerType==8) {
+            
+            //判断题目是否被收藏
+            if ([QuestionCollectManager selectCollectQuestiong:model.mid]) {//已被收藏
+                //收藏图标改变
+                [_collectBtn setBackgroundImage:[UIImage imageNamed:[NSString stringWithFormat:@"18.png"]] forState:UIControlStateNormal];
+                _collectBtnLabel.text = @"收藏本题";
+                
                 _collectLabel.text = @"已取消";
+                
                 _collectView.alpha = 1;
                 [QuestionCollectManager removeCollectQuestion:model.mid];
                 
@@ -401,7 +446,12 @@
                 [UIView animateWithDuration:0.5 delay:1 options:UIViewAnimationOptionAllowAnimatedContent animations:^{
                     _collectView.alpha = 0;
                 } completion:nil];
-            }else{
+                
+            } else {
+                //收藏图标改变
+                [_collectBtn setBackgroundImage:[UIImage imageNamed:[NSString stringWithFormat:@"18-2.png"]] forState:UIControlStateNormal];
+                _collectBtnLabel.text = @"取消收藏";
+                
                 _collectLabel.text = @"已收藏";
                 _collectView.alpha = 1;
                 //判断没收藏过的进行收藏
