@@ -13,6 +13,7 @@
 #import "SheetView.h"
 #import "MainTestViewController.h"
 #import "QuestionCollectManager.h"
+#import "TestResultViewController.h"
 
 @interface AnswerViewController ()<SheetViewDelegate,ChangeLabelDelegate>
 {
@@ -76,6 +77,7 @@
     NSMutableArray *arr = [[NSMutableArray alloc]init];
     //取随机数据
     NSMutableArray *arrRandom = [[NSMutableArray alloc]init];
+    NSMutableArray *testRandom = [[NSMutableArray alloc]init];
 
     switch (_answerType) {
         case 1:{//章节练习
@@ -99,8 +101,8 @@
             [arrRandom addObjectsFromArray:array];
             
             for (int i=0; i<array.count; i++) {
-                int indexRandom = (int)random()%(arrRandom.count);
-                AnswerModel *model = array[indexRandom];
+                int indexRandom = (int)arc4random()%(arrRandom.count);
+                AnswerModel *model = arrRandom[indexRandom];
                 [arr addObject:model];
                 [arrRandom removeObjectAtIndex:indexRandom];
             }
@@ -116,12 +118,13 @@
         }
             break;
         case 5:{//仿真模拟考试
-            [arrRandom addObjectsFromArray:array];
+            [testRandom addObjectsFromArray:array];
             for (int i=0; i<100; i++) {
-                int indexRandom = (int)random()%(arrRandom.count);
-                AnswerModel *model = array[indexRandom];
+                int indexRandom = (int)arc4random()%(testRandom.count);
+                
+                AnswerModel *model = testRandom[indexRandom];
                 [arr addObject:model];
-                [arrRandom removeObjectAtIndex:indexRandom];
+                [testRandom removeObjectAtIndex:indexRandom];
             }
             
             //改变导航栏样式
@@ -281,6 +284,10 @@
     UIAlertController *rightAlert = [UIAlertController alertControllerWithTitle:@"温馨提示" message:@"确定要交卷吗？" preferredStyle:UIAlertControllerStyleAlert];
     UIAlertAction *cancelRAcion = [UIAlertAction actionWithTitle:@"取消" style:UIAlertActionStyleCancel handler:nil];
     UIAlertAction *okeyRAction = [UIAlertAction actionWithTitle:@"确定" style:UIAlertActionStyleDefault handler:^(UIAlertAction *actionRight){
+        
+        //考试结果
+        [self getResult];
+        
         [self.navigationController popViewControllerAnimated:YES];
     }];
     
@@ -289,6 +296,33 @@
     
     [self presentViewController:rightAlert animated:YES completion:nil];
 }
+
+- (void)getResult {
+    NSUInteger count = _anScrollView.wrongOrRightArray.count;
+    NSUInteger wrongCount = 0;
+    NSUInteger hadNotCount = 0;
+    
+    for (int i = 0; i < count; i ++) {
+        if ([_anScrollView.wrongOrRightArray[i] isEqualToString:@"1"]) {
+            wrongCount += 1;
+        }
+        
+        if ([_anScrollView.hadAnswerArray[i] isEqualToString:@"0"]) {
+            hadNotCount += 1;
+        }
+    }
+    
+    TestResultViewController *trViewCon = [[TestResultViewController alloc]init];
+    
+    [trViewCon testResultLabel:wrongCount andHadnot:hadNotCount];
+    
+    [self presentViewController:trViewCon animated:YES completion:nil];
+    
+    NSLog(@"答错：%lu",(unsigned long)wrongCount);
+    NSLog(@"未答：%lu",(unsigned long)hadNotCount);
+
+}
+
 //导航栏计时器
 -(void)creatTimeLabel{
     _testTime = 2700;
