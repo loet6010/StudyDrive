@@ -257,15 +257,9 @@
         case 4://模拟仿真考试
         {
             MainTestViewController *mtvCon = [[MainTestViewController alloc]init];
-            
-            //从MyDataManager的getData方法中得到数组值
-//            tsCon.dataArray = [MyDataManager getData:specific];
-            //设置导航栏标题
-//            tsCon.myTitle = @"专项练习";
+        
             //设置返回样式
             [self.navigationItem setBackBarButtonItem:fvcItem];
-            //将练习模式：4，章节练习 传值给TestSelectViewController
-//            tsCon.myTestType = 4;
             
             //导航栏PUSH到下一个view
             [self.navigationController pushViewController:mtvCon animated:YES];
